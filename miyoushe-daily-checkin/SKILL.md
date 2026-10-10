@@ -1,6 +1,7 @@
 ---
 name: miyoushe-daily-checkin
-description: 米游社（原神 + 崩坏：星穹铁道 + 崩坏3 + 绝区零）每日签到自动化。调用米游社 Luna 签到接口完成国服游戏每日签到，需用户自行提供网页端 Cookie。当用户要求「米游社签到」「原神/星铁每日签到」「自动签到」「封装米游社签到 skill」或使用米游社福利签到相关任务时使用。
+description: Automate daily check‑in for Miyoushe Genshin Impact and Honkai:Star Rail. Require user provide web cookie. Use when user asks for miyoushe daily sign‑in, genshin/hsr auto checkin.
+description-cn: 米游社（原神 + 崩坏：星穹铁道）每日签到自动化。调用米游社 Luna 签到接口完成国服游戏每日签到，需用户自行提供网页端 Cookie。当用户要求「米游社签到」「原神/星铁每日签到」「自动签到」「封装米游社签到 skill」或使用米游社福利签到相关任务时使用。
 agent_created: true
 ---
 
