@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-<<<<<<< HEAD
 米游社每日签到脚本（纯标准库实现，无第三方依赖）
 
 支持游戏（国服）：
@@ -20,27 +19,6 @@
   若误用 DS v2 格式（salt 开头+ b/q 段），服务端会返回
   `-500012 活动已结束` —— 该错误码极具误导性，实际含义是「签名校验未通过」，
   而不是活动真的下线了。
-=======
-米游社每日签到（原神 + 崩坏：星穹铁道）
-====================================
-仅依赖 Python 标准库，无需安装第三方包。
-
-实现说明：
-  - 调用米游社（api-takumi.mihoyo.com）的游戏签到接口。
-  - 需要米游社网页端登录后的 Cookie（必须包含 ltoken 与 ltuid）。
-  - 每次请求带 DS 动态签名（web 端 salt），以及 x-rpc-act_id / x-rpc-signgame 等头。
-
-使用步骤：
-  1. 在 config.json 中填入你的米游社网页端 Cookie（见下方说明）。
-  2. 运行：python miyoushe_sign.py
-  3. 查看输出；成功/失败会以 SUMMARY 段落汇总（便于自动化读取）。
-
-获取 Cookie 的方法（米游社网页端）：
-  1. 浏览器打开 https://user.mihoyo.com/ 并登录米哈游账号。
-  2. 打开开发者工具（F12）→ 网络(Network) → 任意请求 → 复制 Request Headers 里的 Cookie 整串。
-  3. 粘贴到 config.json 的 "cookie" 字段。
-  Cookie 中需包含 ltoken、ltuid（或 account_id）；cookie_token 也建议带上。
->>>>>>> 7196630bfc691681457679fecd8011c0142b537d
 """
 
 import json
@@ -48,7 +26,6 @@ import time
 import random
 import string
 import hashlib
-<<<<<<< HEAD
 import uuid
 import urllib.request
 import urllib.error
@@ -148,90 +125,7 @@ def device_id_from_cookie(cookie: str) -> str:
 def base_headers(cookie: str, device_id: str) -> dict:
     return {
         "Accept": "application/json, text/plain, */*",
-=======
-import urllib.request
-import urllib.error
-import uuid
-import sys
-import os
 
-# ------------------------- 配置常量 -------------------------
-# 米游社 web 端 DS 签名 salt（与米游社网页客户端一致，若官方更换需同步更新）
-WEB_SALT = "d9200c846b10886e8c874fc33c8f308b"
-
-# 各游戏配置：act_id 为当前签到活动 ID（国服），game_biz 用于拉取角色，signgame 为签名头
-GAMES = {
-    "genshin": {
-        "name": "原神",
-        "act_id": "e202311201442471",
-        "game_biz": "hk4e_cn",
-        "signgame": "hk4e",
-    },
-    "hsr": {
-        "name": "崩坏：星穹铁道",
-        "act_id": "e202304121516551",
-        "game_biz": "hkrpg_cn",
-        "signgame": "hkrpg",
-    },
-}
-
-APP_VERSION = "2.109.0"
-CLIENT_TYPE = "5"  # 5 = 移动端 web
-USER_AGENT = (
-    "Mozilla/5.0 (Linux; Android 12; Unspecified Device) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Version/4.0 Chrome/103.0.5060.129 Mobile Safari/537.36 "
-    f"miHoYoBBS/{APP_VERSION}"
-)
-REFERER = "https://act.mihoyo.com/"
-ORIGIN = "https://act.mihoyo.com"
-
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
-
-
-# ------------------------- 工具函数 -------------------------
-def _random_text(num: int = 6) -> str:
-    """生成指定长度的随机字符串（小写字母 + 数字）。"""
-    return ''.join(random.sample(string.ascii_lowercase + string.digits, num))
-
-
-def get_ds():
-    """生成 DS 动态签名（web 端 v1 算法）。
-
-    官方格式：DS = "t,r,md5(salt=<salt>&t=<t>&r=<r>)"
-    与 MihoyoBBSTools/tools.py 中的 get_ds(web=True) 保持一致。
-    """
-    t = str(int(time.time()))
-    r = _random_text(6)
-    q = f"salt={WEB_SALT}&t={t}&r={r}"
-    s = hashlib.md5(q.encode("utf-8")).hexdigest()
-    return f"{t},{r},{s}"
-
-
-def _device_id_from_cookie(cookie: str) -> str:
-    """使用 cookie 通过 uuid v3 生成稳定的设备 ID（与官方一致）。"""
-    return str(uuid.uuid3(uuid.NAMESPACE_URL, cookie))
-
-
-def load_config():
-    if not os.path.exists(CONFIG_PATH):
-        raise FileNotFoundError(
-            f"未找到配置文件 {CONFIG_PATH}，请复制 config.example.json 为 config.json 并填写 Cookie。"
-        )
-    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-        cfg = json.load(f)
-    cookie = (cfg.get("cookie") or "").strip()
-    if not cookie:
-        raise ValueError("config.json 中的 cookie 字段为空，请先填入米游社网页端 Cookie。")
-    device_id = (cfg.get("device_id") or "").strip() or _device_id_from_cookie(cookie)
-    return cookie, device_id
-
-
-def _base_headers(cookie: str, device_id: str) -> dict:
-    """构造通用请求头。"""
-    return {
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Encoding": "gzip, deflate",
->>>>>>> 7196630bfc691681457679fecd8011c0142b537d
         "Accept-Language": "zh-CN,en-US;q=0.8",
         "Cookie": cookie,
         "User-Agent": USER_AGENT,
@@ -243,7 +137,6 @@ def _base_headers(cookie: str, device_id: str) -> dict:
     }
 
 
-<<<<<<< HEAD
 def http_request(method: str, url: str, headers: dict, data: bytes = None) -> dict:
     req = urllib.request.Request(url, data=data, headers=headers, method=method)
     try:
@@ -252,24 +145,13 @@ def http_request(method: str, url: str, headers: dict, data: bytes = None) -> di
     except urllib.error.HTTPError as e:
         raw = e.read().decode("utf-8", errors="ignore")
     except Exception as e:
-=======
-def http_request(method, url, headers, data=None, timeout=20):
-    req = urllib.request.Request(url, data=data, headers=headers, method=method)
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            raw = resp.read().decode("utf-8", errors="ignore")
-    except urllib.error.HTTPError as e:
-        raw = e.read().decode("utf-8", errors="ignore")
-    except Exception as e:  # noqa: BLE001
->>>>>>> 7196630bfc691681457679fecd8011c0142b537d
+
         return {"retcode": -1, "message": f"网络请求异常: {e}"}
     try:
         return json.loads(raw)
     except json.JSONDecodeError:
         return {"retcode": -2, "message": f"响应非 JSON: {raw[:200]}"}
 
-
-<<<<<<< HEAD
 def describe(retcode, message: str) -> str:
     if retcode == 0:
         return "OK"
@@ -405,113 +287,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-=======
-def get_game_roles(cookie, device_id, game_biz):
-    """拉取该账号下绑定了某游戏的角色列表。"""
-    url = (
-        "https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie"
-        f"?game_biz={game_biz}"
-    )
-    headers = _base_headers(cookie, device_id)
-    headers["Referer"] = "https://webstatic.mihoyo.com/"
-    headers["DS"] = get_ds()
-    resp = http_request("GET", url, headers)
-    if resp.get("retcode") != 0:
-        return None, resp.get("message") or "未知错误"
-    return resp.get("data", {}).get("list", []), None
 
-
-def is_signed_today(cookie, device_id, game, region, uid):
-    """查询今天是否已签到（/event/luna/info）。返回值：True/False/None（查询失败）。"""
-    url = (
-        "https://api-takumi.mihoyo.com/event/luna/info"
-        f"?lang=zh-cn&act_id={game['act_id']}&region={region}&uid={uid}"
-    )
-    headers = _base_headers(cookie, device_id)
-    headers["Referer"] = REFERER
-    headers["Origin"] = ORIGIN
-    headers["DS"] = get_ds()
-    if game.get("signgame"):
-        headers["x-rpc-signgame"] = game["signgame"]
-    resp = http_request("GET", url, headers)
-    if resp.get("retcode") != 0:
-        return None, resp.get("message")
-    data = resp.get("data", {})
-    return data.get("is_sign", False), None
-
-
-def sign(cookie, device_id, game):
-    """对单个游戏下的所有角色执行签到。返回结果文本列表。"""
-    lines = []
-    roles, err = get_game_roles(cookie, device_id, game["game_biz"])
-    if err is not None:
-        return [f"{game['name']}: 获取角色失败 - {err}"]
-    if not roles:
-        return [f"{game['name']}: 未绑定游戏角色（请确认账号已绑定 {game['name']}）"]
-
-    for role in roles:
-        region = role.get("region")
-        uid = role.get("game_uid")
-        nickname = role.get("nickname") or uid
-
-        # 先查今天是否已签
-        signed, info_err = is_signed_today(cookie, device_id, game, region, uid)
-        if signed is True:
-            lines.append(f"SKIP| {game['name']} | {nickname} (uid={uid}) 今天已经签到过")
-            continue
-
-        url = "https://api-takumi.mihoyo.com/event/luna/sign"
-        body = json.dumps(
-            {"act_id": game["act_id"], "region": region, "uid": uid},
-            separators=(",", ":"),
-        )
-        headers = _base_headers(cookie, device_id)
-        headers.update({
-            "Content-Type": "application/json",
-            "Referer": REFERER,
-            "Origin": ORIGIN,
-            "x-rpc-act_id": game["act_id"],
-            "DS": get_ds(),
-        })
-        if game.get("signgame"):
-            headers["x-rpc-signgame"] = game["signgame"]
-
-        resp = http_request("POST", url, headers, data=body.encode("utf-8"))
-        rc = resp.get("retcode")
-        msg = resp.get("message")
-        if rc == 0:
-            lines.append(f"OK  | {game['name']} | {nickname} (uid={uid}) 签到成功")
-        elif rc == -5003:
-            lines.append(f"SKIP| {game['name']} | {nickname} (uid={uid}) 今天已经签到过")
-        else:
-            lines.append(
-                f"FAIL| {game['name']} | {nickname} (uid={uid}) "
-                f"retcode={rc} message={msg}"
-            )
-    return lines
-
-
-def main():
-    cookie, device_id = load_config()
-    all_lines = []
-    for key, g in GAMES.items():
-        print(f"\n=== {g['name']} ===")
-        res = sign(cookie, device_id, g)
-        for line in res:
-            print("  " + line)
-            all_lines.append(line)
-
-    print("\n---SUMMARY---")
-    for line in all_lines:
-        print(line)
-    failed = [l for l in all_lines if l.startswith("FAIL")]
-    return all_lines, failed
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:  # noqa: BLE001
-        print(f"ERROR: {e}")
-        sys.exit(1)
->>>>>>> 7196630bfc691681457679fecd8011c0142b537d
